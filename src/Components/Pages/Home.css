@@ -1,0 +1,16 @@
+.profile-card {
+	display: flex;
+	align-items: center;
+	height: 250px;
+	width: 500px;
+	border-radius: 50px;
+	background-color: white;
+}
+
+.profile-avatar {
+	height: 150px;
+	width: 150px;
+	margin-left: 1%;
+	border-radius: 50%;
+	background-size: cover;
+}

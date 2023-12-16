@@ -1,0 +1,161 @@
+.left-login {
+	z-index: 105;
+	position: absolute;
+	height: 100%;
+	width: 50%;
+	background-position: 100% 0%;
+	background-image: url('https://imgur.com/2v46tZ0.jpg');
+	background-size: cover;
+	transition: all 1s;
+}
+
+.left-login ul{
+	display: none;
+}
+
+.right-login {
+	z-index: 105;
+	position: absolute;
+	transform: translateX(100%);
+	display: grid;
+	align-items: center;
+	height: 100%;
+	width: 50%;
+	background-color: #2d2d2d;
+	transition: all 1s;
+}
+
+.right-login * {
+	justify-self: center;
+}
+
+.right-login.auth {
+	transform: translateX(200%);
+	transition: all 1s;
+}
+
+.right-login span { /* server image */
+	height: 200px;
+	width: 200px;
+	margin-top: 15%;
+	margin-bottom: 10%;
+	border-radius: 25%;
+	background-image: url('https://cdn.discordapp.com/icons/773660297696772096/4429a4cab28533327e3134b415de2616.webp');
+	background-size: cover;
+}
+
+.login-body {
+	display: grid;
+}
+
+.login-body p {
+	visibility: hidden;
+}
+
+.login-body p.error {
+	visibility: visible;
+	color: red;
+	animation: shake .25s;
+}
+
+@keyframes shake {
+	0% {transform: translateX(0)}
+	25% {transform: translateX(5px)}
+	50% {transform: translateX(-5px)}
+	75% {transform: translateX(5px)}
+	100% {transform: translateX(0)}
+}
+
+.login-body input {
+	margin-bottom: 10px;
+	border: 1px solid;
+	border-radius: 50px;
+	padding: 5px;
+	font-size: 14px;
+	text-align: center;
+}
+
+.login-body button {
+	position: relative;
+	margin: 5px 25px;
+	border: 2px solid cyan;
+	padding: 5px;
+	background: none;
+	font-size: 20px;
+}
+
+.login-body button span {
+	z-index: 1;
+	position: relative;
+	color: cyan;
+	background: none;
+	transition: .2s linear;
+}
+
+.login-body button:before,
+.login-body button:after {
+	content: "";
+	position: absolute;
+	background: #2d2d2d;
+	transition: all .2s linear;
+}
+
+.login-body button:before {
+	top: 8px;
+	left: -3px;
+	width: calc(100% + 6px);
+	height: calc(100% - 16px);
+}
+ 
+.login-body button:after {
+	top: -3px;
+	left: 8px;
+	width: calc(100% - 16px);
+	height: calc(100% + 6px);
+}
+
+.login-body button:hover {
+	cursor: crosshair;
+	border: 2px solid pink;
+	transition: .5s;
+}
+
+.login-body button:hover span {
+	color: pink;
+	transition: .2s linear;
+}
+
+.login-body button:hover:before {
+	top: 12px;
+	height: calc(100% - 22px);
+}
+ 
+.login-body button:hover:after {
+	left: 16px;
+	width: calc(100% - 32px);
+}
+
+.login-body button:active {
+	transform: scale(.85);
+}
+
+.right-login > p {
+	text-shadow: 0 0 20px cyan;
+	color: cyan;
+	font-size: 150px;
+	animation: breathe 2s linear infinite;
+}
+
+@keyframes breathe {
+	0% {
+		text-shadow: 0 0 20px cyan;
+	}
+
+	50% {
+		text-shadow: 0 0 10px cyan;
+	}
+
+	100% {
+		text-shadow: 0 0 20px cyan;
+	}
+}
