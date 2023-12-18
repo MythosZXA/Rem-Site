@@ -45,7 +45,9 @@ export function Login() {
 	}
 
 	const resetLogin = () => {
-
+		setInput('');
+		setReqType('U');
+		setPlaceholder('DC Username');
 	}
 
 	return (
