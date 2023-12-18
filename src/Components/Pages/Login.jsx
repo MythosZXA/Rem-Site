@@ -39,6 +39,9 @@ export function Login() {
 						avatarURL: resBody.avatarURL
 					});
 					navigate('/home');
+				} else {
+					setErrMsg('Incorrect pin');
+					setError(true);
 				}
 				break;
 		}
@@ -48,6 +51,7 @@ export function Login() {
 		setInput('');
 		setReqType('U');
 		setPlaceholder('DC Username');
+		setError(false);
 	}
 
 	return (

@@ -15,7 +15,7 @@ function ProtectedRoute({ auth, children }) {
 	}, []);
 
 	return children;
-};
+}
 
 export default function Root() {
 	const [avatarURL, setAvatarURL] = useState('');
@@ -23,7 +23,7 @@ export default function Root() {
 	const {auth, setAuth} = useContext(AuthContext);
 
 	useEffect(() => {
-		console.log(auth)
+		
 	}, []);
 
 	return (
