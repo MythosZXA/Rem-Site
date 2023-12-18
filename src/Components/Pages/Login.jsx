@@ -23,9 +23,17 @@ export function Login() {
 		switch (reqType) {
 			case 'U':
 				if (resBody) {
-					setInput('');
-					setReqType('C');
-					setPlaceholder('6-Digit Pin');
+					// Rem login
+					if (resBody.avatarURL) {
+						setAuth({ avatarURL: resBody.avatarURL });
+						navigate('/home');
+					} 
+					// member login
+					else {
+						setInput('');
+						setReqType('C');
+						setPlaceholder('6-Digit Pin');
+					}
 				} else {
 					setErrMsg('Username not found');
 					setError(true);
