@@ -25,7 +25,10 @@ export function Login() {
 				if (resBody) {
 					// Rem login
 					if (resBody.avatarURL) {
-						setAuth({ avatarURL: resBody.avatarURL });
+						setAuth({
+							admin: true,
+							avatarURL: resBody.avatarURL
+						});
 						navigate('/home');
 					} 
 					// member login
@@ -43,6 +46,7 @@ export function Login() {
 				if (resBody) {
 					setAuth({
 						id: resBody.id,
+						admin: resBody.admin,
 						username: resBody.username,
 						avatarURL: resBody.avatarURL
 					});
