@@ -1,5 +1,5 @@
 import { HOST } from '../../config';
-import react, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import './Palia.css';
 
 export default function Palia() {

@@ -2,15 +2,22 @@ import { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../AuthContext';
 import './LHN.css'
+import api from '../api';
 
 export default function LHN() {
 	const navigate = useNavigate();
 	const {auth, setAuth} = useContext(AuthContext);
 	const [active, setActive] = useState(false);
 
-	const logout = () => {
-		setAuth(false);
-		navigate('/login');
+	const logout = async () => {
+		const resBody = await api('POST', 'logout');
+
+		if (resBody) {
+			setAuth(false);
+			navigate('/login');
+		} else {
+			console.log('Session was not found on the server');
+		}
 	}
 
 	const renderTab = (label) => {
@@ -18,7 +25,8 @@ export default function LHN() {
 			<li onClick={ () => {
 					navigate(`/${label.toLowerCase()}`);
 					setActive(false);
-				}}>
+				}}
+			>
 				{label}
 			</li>
 		)
