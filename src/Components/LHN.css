@@ -12,6 +12,7 @@
 
 .nav-button:hover {
 	background-color: cyan;
+	cursor: pointer;
 }
 
 .nav-button.active:hover {
@@ -63,6 +64,8 @@
 	padding: 10px 0 10px 10%;
 	font-size: 18px;
 	color: cyan;
+	user-select: none;
+	cursor: pointer;
 }
 
 .lhn ul li:last-child {

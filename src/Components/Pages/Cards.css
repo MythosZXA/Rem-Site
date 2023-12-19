@@ -39,6 +39,7 @@
 
 .player-list li:not(.selected):hover {
 	background-color: pink;
+	cursor: pointer;
 }
 
 .player-list img {
@@ -51,4 +52,5 @@
 
 .player-list p {
 	padding: 0 5px;
+	user-select: none;
 }
