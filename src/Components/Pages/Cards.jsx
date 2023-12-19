@@ -5,7 +5,7 @@ import './Cards.css';
 export default function Cards() {
 	const [active, setActive] = useState(false);
 	const [players, setPlayers] =  useState([]); // players currently in the lobby
-	const [selected, setSelected] = useState(new Set());
+	const [selected, setSelected] = useState(new Set()); // players currently selected
 
 	useEffect(() => {
 		const lobby = new EventSource(`${HOST}/cards/lobby`, { withCredentials: true });
@@ -13,6 +13,19 @@ export default function Cards() {
 		// new player joined lobby
 		lobby.onmessage = e => {
 			setPlayers(JSON.parse(e.data));
+
+			// remove selected players that aren't in lobby
+			if (!players.length) {
+				setSelected(new Set());
+			} else {
+				selected.forEach(username => {
+					if (!players.some(player => player.username === username)) {
+						const newSel = new Set(selected);
+						newSel.delete(username);
+						setSelected(newSel);
+					}
+				});
+			}
 		};
 
 		// error
@@ -38,7 +51,7 @@ export default function Cards() {
 	}
 
 	const startGame = () => {
-		
+
 	}
 
 	return(
