@@ -4,7 +4,8 @@ import './Cards.css';
 
 export default function Cards() {
 	const [active, setActive] = useState(false);
-	const [players, setPlayers] =  useState([]); // players current in the cards page
+	const [players, setPlayers] =  useState([]); // players currently in the lobby
+	const [selected, setSelected] = useState(new Set());
 
 	useEffect(() => {
 		const lobby = new EventSource(`${HOST}/cards/lobby`, { withCredentials: true });
@@ -26,24 +27,55 @@ export default function Cards() {
 		}
 	}, []);
 
+	const selectPlayer = username => {
+		const newSel = new Set(selected);
+		if (newSel.has(username)) {
+			newSel.delete(username);
+		} else if (selected.size < 3) {
+			newSel.add(username);
+		}
+		setSelected(newSel);
+	}
+
+	const startGame = () => {
+		
+	}
+
 	return(
 		<div className="page-container" id="containerCards">
 			<div className="select-container">
 				<h3>Select up to 3 other players</h3>
-				{players.length > 0 &&
-					<ul className="player-list">
-						{players.map((player, i) => (
-							<li key={`lp${i}`}>
-								<img style={{ backgroundImage: `url(${player.avatarURL})`}}/>
-								<p>{player.username}</p>
-							</li>
-						))}
-					</ul>
-				}
-				{players.length === 0 && 
+				{players.length > 0 ?
+					<>
+						<PlayerList players={players} selected={selected} selectPlayer={selectPlayer}/>
+						{selected.size > 0 && <button onClick={startGame}>Start</button>}
+					</>
+					:
 					<h4>No other players currently in the lobby...</h4>
 				}
 			</div>
 		</div>
+	)
+}
+
+function PlayerList({ players, selected, selectPlayer }) {
+	return (
+		<ul className="player-list">
+			{players.map((player, i) => (
+				<Player key={`li${i}`} player={player} selected={selected} selectPlayer={selectPlayer}/>
+			))}
+		</ul>
+	)
+}
+
+function Player({ player, selected, selectPlayer }) {
+	return (
+		<li
+			className={selected.has(player.username) ? 'selected' : ''}
+			onClick={() => selectPlayer(player.username)}
+		>
+			<img style={{ backgroundImage: `url(${player.avatarURL})`}}/>
+			<p>{player.username}</p>
+		</li>
 	)
 }

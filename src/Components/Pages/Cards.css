@@ -28,10 +28,17 @@
 .player-list li {
 	display: flex;
 	align-items: center;
-	/* margin: 0 10px; */
 	border: solid 1px;
 	border-radius: 50px;
 	padding: 5px 5px;
+}
+
+.player-list li.selected {
+	background-color: cyan;
+}
+
+.player-list li:not(.selected):hover {
+	background-color: pink;
 }
 
 .player-list img {
