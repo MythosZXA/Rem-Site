@@ -74,7 +74,6 @@ div:has(> .chat-select) {
 
 .chat-select ul {
 	width: 50%;
-	list-style-type: none;
 }
 
 .chat-select ul li {

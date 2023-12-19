@@ -6,6 +6,7 @@ import { AuthProvider } from './AuthContext.jsx';
 import Root from './Components/Root.jsx';
 import Error from './Components/Pages/Error.jsx';
 import Home from './Components/Pages/Home.jsx';
+import Cards from './Components/Pages/Cards.jsx';
 import Palia from './Components/Pages/Palia.jsx';
 import Message from './Components/Pages/Message.jsx';
 
@@ -20,6 +21,7 @@ const router = createBrowserRouter([
 		errorElement: <Error/>,
 		children: [
 			{ path: 'home', element: <Home/> },
+			{ path: 'cards', element: <Cards/> },
 			{ path: 'palia', element: <Palia/> },
 			{ path: 'message', element: <Message/> }
 		]

@@ -40,6 +40,7 @@ export default function LHN() {
 			<nav className={`lhn ${active ? "active" : ""}`}>
 				<ul className="nav-list">
 					{renderTab('Home')}
+					{auth && renderTab('Cards')}
 					{auth && renderTab('Palia')}
 					{auth.admin && renderTab('Message')}
 					<li onClick={logout}>Logout</li>
