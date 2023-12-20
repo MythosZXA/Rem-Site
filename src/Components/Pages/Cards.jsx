@@ -4,6 +4,13 @@ import './Cards.css';
 
 export default function Cards() {
 	const [active, setActive] = useState(false);
+	
+	return(
+		<Lobby/>
+	)
+}
+
+function Lobby() {
 	const [players, setPlayers] =  useState([]); // players currently in the lobby
 	const [selected, setSelected] = useState(new Set()); // players currently selected
 
@@ -54,7 +61,7 @@ export default function Cards() {
 
 	}
 
-	return(
+	return (
 		<div className="page-container" id="containerCards">
 			<div className="select-container">
 				<h3>Select up to 3 other players</h3>
@@ -68,6 +75,7 @@ export default function Cards() {
 				}
 			</div>
 		</div>
+
 	)
 }
 
@@ -91,4 +99,8 @@ function Player({ player, selected, selectPlayer }) {
 			<p>{player.username}</p>
 		</li>
 	)
+}
+
+function Table() {
+	
 }
