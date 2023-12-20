@@ -1,12 +1,18 @@
 import { useEffect, useState } from "react";
+import Draggable from "react-draggable";
 import { HOST } from "../../config";
+import api from '../../api.js';
 import './Cards.css';
+import cards from '../../Images/Cards/index.js';
 
 export default function Cards() {
 	const [active, setActive] = useState(false);
 	
 	return(
-		<Lobby/>
+		<div className="page-container" id="containerCards">
+			{/* <Lobby/> */}
+			<Table/>
+		</div>
 	)
 }
 
@@ -62,18 +68,16 @@ function Lobby() {
 	}
 
 	return (
-		<div className="page-container" id="containerCards">
-			<div className="select-container">
-				<h3>Select up to 3 other players</h3>
-				{players.length > 0 ?
-					<>
-						<PlayerList players={players} selected={selected} selectPlayer={selectPlayer}/>
-						{selected.size > 0 && <button onClick={startGame}>Start</button>}
-					</>
-					:
-					<h4>No other players currently in the lobby...</h4>
-				}
-			</div>
+		<div className="select-container">
+			<h3>Select up to 3 other players</h3>
+			{players.length > 0 ?
+				<>
+					<PlayerList players={players} selected={selected} selectPlayer={selectPlayer}/>
+					{selected.size > 0 && <button onClick={startGame}>Start</button>}
+				</>
+				:
+				<h4>No other players currently in the lobby...</h4>
+			}
 		</div>
 
 	)
@@ -102,5 +106,17 @@ function Player({ player, selected, selectPlayer }) {
 }
 
 function Table() {
-	
+	const [table, setTable] = useState([]);
+	const [hand, setHand] = useState([]);
+
+	return (
+		<>
+			<button onClick={() => {
+				api('POST', 'cards/start');
+			}}>yessssssss</button>
+			<Draggable>
+				<div className="card" style={{backgroundImage: `url(${cards["c1"]})`}}/>
+			</Draggable>
+		</>
+	)
 }

@@ -54,3 +54,9 @@
 	padding: 0 5px;
 	user-select: none;
 }
+
+div.card {
+	height: 81px;
+	width: 55px;
+	background-size: contain;
+}
