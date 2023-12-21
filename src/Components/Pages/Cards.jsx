@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Draggable from "react-draggable";
 import { HOST } from "../../config";
 import api from '../../api.js';
@@ -7,16 +7,25 @@ import cards from '../../Images/Cards/index.js';
 
 export default function Cards() {
 	const [active, setActive] = useState(false);
+	const [hand, setHand] = useState([]);
 	
 	return(
 		<div className="page-container" id="containerCards">
-			{/* <Lobby/> */}
-			<Table/>
+			{active ?
+				<Table
+					hand={ hand }
+					setHand={ setHand }
+				/> :
+				<Lobby
+					setActive={ setActive }
+					setHand={ setHand }
+				/>
+			}
 		</div>
 	)
 }
 
-function Lobby() {
+function Lobby({ setActive, setHand }) {
 	const [players, setPlayers] =  useState([]); // players currently in the lobby
 	const [selected, setSelected] = useState(new Set()); // players currently selected
 
@@ -26,19 +35,6 @@ function Lobby() {
 		// new player joined lobby
 		lobby.onmessage = e => {
 			setPlayers(JSON.parse(e.data));
-
-			// remove selected players that aren't in lobby
-			if (!players.length) {
-				setSelected(new Set());
-			} else {
-				selected.forEach(username => {
-					if (!players.some(player => player.username === username)) {
-						const newSel = new Set(selected);
-						newSel.delete(username);
-						setSelected(newSel);
-					}
-				});
-			}
 		};
 
 		// error
@@ -53,6 +49,21 @@ function Lobby() {
 		}
 	}, []);
 
+	// remove selected players that aren't in lobby
+	useEffect(() => {
+		if (!players.length) {
+			setSelected(new Set());
+		} else {
+			selected.forEach(username => {
+				if (!players.some(player => player.username === username)) {
+					const newSel = new Set(selected);
+					newSel.delete(username);
+					setSelected(newSel);
+				}
+			});
+		}
+	}, [players]);
+
 	const selectPlayer = username => {
 		const newSel = new Set(selected);
 		if (newSel.has(username)) {
@@ -63,8 +74,15 @@ function Lobby() {
 		setSelected(newSel);
 	}
 
-	const startGame = () => {
+	const startGame = async () => {
+		const resBody = await api('POST', 'cards/start', {
+			players: [...selected]
+		});
 
+		if (resBody) {
+			setActive(true);
+			setHand(resBody);
+		}
 	}
 
 	return (
@@ -105,18 +123,27 @@ function Player({ player, selected, selectPlayer }) {
 	)
 }
 
-function Table() {
+function Table({ hand, setHand }) {
+	const tableRef = useRef();
 	const [table, setTable] = useState([]);
-	const [hand, setHand] = useState([]);
+
+	const placeCard = dragData => {
+		console.log(tableRef.current.getBoundingClientRect())
+	}
 
 	return (
-		<>
-			<button onClick={() => {
-				api('POST', 'cards/start');
-			}}>yessssssss</button>
-			<Draggable>
-				<div className="card" style={{backgroundImage: `url(${cards["c1"]})`}}/>
-			</Draggable>
-		</>
+		<div>
+			<div className="table" ref={tableRef}></div>
+			<div className="hand">
+				{hand.map((card) => (
+					<Draggable
+						key={`d${card}`}
+						onStop={(e, data) => placeCard(data)}
+					>
+						<div className="card" style={{backgroundImage: `url(${cards[card]})`}}/>
+					</Draggable>
+				))}
+			</div>
+		</div>
 	)
 }

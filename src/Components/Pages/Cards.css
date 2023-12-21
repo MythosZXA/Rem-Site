@@ -1,5 +1,4 @@
 #containerCards {
-	flex-direction: column;
 	justify-content: center;
 }
 
@@ -55,8 +54,24 @@
 	user-select: none;
 }
 
-div.card {
-	height: 81px;
-	width: 55px;
+div:has(.table) {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+}
+
+.table {
+	border: solid 5px;
+	height: 80%;
+	width: 80%;
+}
+
+.hand {
+	display: flex;
+}
+
+.card {
+	height: 100px;
+	width: 67px;
 	background-size: contain;
 }
