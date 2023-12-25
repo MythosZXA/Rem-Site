@@ -1,3 +1,9 @@
+.column {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
 #containerCards {
 	justify-content: center;
 }
@@ -54,20 +60,65 @@
 	user-select: none;
 }
 
-div:has(.table) {
+div:has(> .table) {
 	display: flex;
 	flex-direction: column;
+	justify-content: center;
 	flex-grow: 1;
 }
 
 .table {
+	position: relative;
+	margin-bottom: 50px;
 	border: solid 5px;
-	height: 80%;
-	width: 80%;
+	height: 800px;
+	width: 875px;
+}
+
+.table button {
+	position: absolute;
+	bottom: 0;
+	margin: 5px 25px;
+	border: 2px solid cyan;
+	padding: 5px;
+	background: none;
+	font-size: 20px;
+}
+
+.table button span {
+	z-index: 1;
+	position: relative;
+	color: cyan;
+	background: none;
+	transition: .2s linear;
+}
+
+.table button:before,
+.table button:after {
+	content: "";
+	position: absolute;
+	background: dimgray;
+	transition: all .2s linear;
+}
+
+.table button:before {
+	top: 8px;
+	left: -3px;
+	width: calc(100% + 6px);
+	height: calc(100% - 16px);
+}
+ 
+.table button:after {
+	top: -3px;
+	left: 8px;
+	width: calc(100% - 16px);
+	height: calc(100% + 6px);
 }
 
 .hand {
+	position: relative;
 	display: flex;
+	justify-content: center;
 }
 
 .card {

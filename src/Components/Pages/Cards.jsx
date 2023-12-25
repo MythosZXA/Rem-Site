@@ -12,7 +12,7 @@ export default function Cards() {
 	return(
 		<div className="page-container" id="containerCards">
 			{active ?
-				<Table
+				<Game
 					hand={ hand }
 					setHand={ setHand }
 				/> :
@@ -123,24 +123,110 @@ function Player({ player, selected, selectPlayer }) {
 	)
 }
 
-function Table({ hand, setHand }) {
+function Game({ hand, setHand }) {
 	const tableRef = useRef();
-	const [table, setTable] = useState([]);
+	const [table, setTable] = useState([[]]);
 
-	const placeCard = dragData => {
-		console.log(tableRef.current.getBoundingClientRect())
+	const placeCard = (e, dragData) => {
+		const tableRect = tableRef.current.getBoundingClientRect();
+		const cardOrigin = dragData.node.getAttribute('origin');
+
+
+		if (cardOrigin === 'table' && !isInsideTable({x: e.clientX, y: e.clientY}, tableRect)) {
+			takeFromTable(dragData.node.id);
+		} else if (cardOrigin === 'hand') {
+			if (isInsideTable({x: e.clientX, y: e.clientY}, tableRect)) {
+				placeToTable(dragData.node.id);
+			} else if (e.clientX < tableRect.left) {
+				moveCard(dragData.node.id, 'B');
+			} else if (e.clientX > tableRect.right) {
+				moveCard(dragData.node.id, 'F');
+			}
+		}
+	}
+
+	// helper functions
+	const isInsideTable = (mousePos, tableRect) => {
+		if (tableRect.left < mousePos.x && mousePos.x < tableRect.right &&
+				tableRect.top < mousePos.y && mousePos.y < tableRect.bottom) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	const placeToTable = (cardID) => {
+		// add card from hand to table
+		setTable(prevTable => {
+			const newTable = [...prevTable];
+			newTable[newTable.length - 1].push(cardID);
+			return newTable;
+		});
+		// remove card from hand
+		setHand(prevHand => {
+			let newHand = [...prevHand];
+			newHand = newHand.filter(card => card !== cardID);
+			return newHand;
+		});
+	}
+	const takeFromTable = (cardID) => {
+		// remove card from table
+		setTable(prevTable => {
+			const newTable = [...prevTable];
+			newTable[newTable.length - 1] = newTable[newTable.length - 1].filter(card => card !== cardID);
+			return newTable;
+		});
+		// add card to hand
+		setHand(prevHand => {
+			const newHand = [...prevHand];
+			newHand.push(cardID);
+			return newHand;
+		});
+	}
+	const moveCard = (cardID, destination) => {
+		setHand(prevHand => {
+			let newHand = [...prevHand];
+			newHand = newHand.filter(card => card !== cardID);
+			destination === 'F' ? newHand.push(cardID) : newHand.unshift(cardID);
+			return newHand;
+		});
 	}
 
 	return (
 		<div>
-			<div className="table" ref={tableRef}></div>
+			<div className="table column" ref={tableRef}>
+				{table.map((row, i) => (
+					<div key={`tr${i}`} className="hand">
+						{row.map((card, i) => (
+							<Draggable
+								key={`td${card}`}
+								onStop={(e, dragData) => placeCard(e, dragData)}
+								position={{x: 0, y: 0}}
+							>
+								<div
+									className="card"
+									id={card}
+									origin="table"
+									style={{backgroundImage: `url(${cards[card]})`}}
+								/>
+							</Draggable>
+						))}
+					</div>
+				))}
+				{table[table.length-1].length > 0 && <button><span>Play</span></button>}
+			</div>
 			<div className="hand">
-				{hand.map((card) => (
+				{hand.map(card => (
 					<Draggable
 						key={`d${card}`}
-						onStop={(e, data) => placeCard(data)}
+						onStop={(e, dragData) => placeCard(e, dragData)}
+						position={{x: 0, y: 0}}
 					>
-						<div className="card" style={{backgroundImage: `url(${cards[card]})`}}/>
+						<div
+							className="card"
+							id={card}
+							origin="hand"
+							style={{backgroundImage: `url(${cards[card]})`}}
+						/>
 					</Draggable>
 				))}
 			</div>
