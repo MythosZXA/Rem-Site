@@ -59,27 +59,9 @@ function ChatSelect({ selectedChat, setSelectedChat, setMessageHistory }) {
 		setSelectedChat(chatName);
 
 		// load chat messages
-		const messageHistory = await retrieveMessageHistory(chatName);
+		const resBody = await api('POST', 'messageHistory', { chatName: chatName });
+		const messageHistory = resBody ?? [];
 		setMessageHistory(messageHistory);
-	}
-
-	const retrieveMessageHistory = async (chatName) => {
-		const response = await fetch(`${HOST}/messageHistory`, {
-			method: 'POST',
-			headers: {
-				"Content-Type": "application/json",
-				"Accept": "application/json"
-			},
-			body: JSON.stringify({
-				chatName: chatName
-			})
-		});
-		if (response.status === 200) {
-			return await response.json();
-		} else {
-			console.log('Failed to message history');
-			return [];
-		}
 	}
 
 	return (
