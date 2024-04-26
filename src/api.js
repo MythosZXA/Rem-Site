@@ -1,15 +1,20 @@
 import { HOST } from "./config";
 
 export default async function api(method, endpoint, body=undefined) {
-  const res = await fetch(`${HOST}/${endpoint}`, {
-    method: method,
-		headers: {
-			"Content-Type": "application/json",
-			"Accept": "application/json"
-		},
-		credentials: 'include',
-    body: JSON.stringify(body),
-  });
+	let res;
+	try {
+		res = await fetch(`${HOST}/${endpoint}`, {
+			method: method,
+			headers: {
+				"Content-Type": "application/json",
+				"Accept": "application/json"
+			},
+			credentials: 'include',
+			body: JSON.stringify(body),
+		});
+	} catch (e) {
+		console.error('HTTP request failed:', e);
+	}
 
 	if (res.ok) {
 		return res.json();
