@@ -39,27 +39,21 @@ function ChatSelect({ selectedChat, setSelectedChat, setMessageHistory }) {
 	}, []);
 
 	const setupChatSelect = async () => {
-		try {
-			const mBody = await api('GET', 'serverMembers');
-			const cBody = await api('GET', 'textChannels');
-			if (mBody && cBody) {
-				setMembers(mBody.members);
-				setChannels(cBody);
-				remAvatarURL = mBody.remAvatarURL;
-			} else {
-				console.log('Failed to retrieve members and/or channels');
-			}
-		} catch (e) {
-			console.error('Error fetching members and/or channels:', e);
+		const mBody = await api('GET', 'serverMembers');
+		const cBody = await api('GET', 'textChannels');
+		if (mBody && cBody) {
+			setMembers(mBody.members);
+			setChannels(cBody);
+			remAvatarURL = mBody.remAvatarURL;
 		}
 	}
 
-	const selectChat = async (chatName) => {
+	const selectChat = async (id) => {
 		// update selected chat name
-		setSelectedChat(chatName);
+		setSelectedChat(id);
 
 		// load chat messages
-		const resBody = await api('POST', 'messageHistory', { chatName: chatName });
+		const resBody = await api('POST', 'messageHistory', { id: id });
 		const messageHistory = resBody ?? [];
 		setMessageHistory(messageHistory);
 	}
@@ -75,8 +69,8 @@ function ChatSelect({ selectedChat, setSelectedChat, setMessageHistory }) {
 					{members.map((member, i) => (
 						<li
 							key={`mc${i}`}
-							className={member.displayName === selectedChat ? "selected" : ""}
-							onClick={() => selectChat(member.displayName)}
+							className={member.userId === selectedChat ? "selected" : ""}
+							onClick={() => selectChat(member.userId)}
 						>
 							<span style={{backgroundImage: `url(${member.displayAvatarURL})`}}/>
 							<p>{member.displayName}</p>
@@ -87,8 +81,8 @@ function ChatSelect({ selectedChat, setSelectedChat, setMessageHistory }) {
 					{channels.map((channel, i) => (
 						<li
 							key={`cc${i}`}
-							className={channel.name === selectedChat ? "selected" : ""}
-							onClick={() => selectChat(channel.name)}
+							className={channel.id === selectedChat ? "selected" : ""}
+							onClick={() => selectChat(channel.id)}
 						>
 							<p>{channel.name}</p>
 						</li>
