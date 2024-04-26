@@ -99,13 +99,13 @@ function Chat({ selectedChat, messageHistory, setMessageHistory }) {
 
 	useEffect(() => {
 		if (selectedChat) {
-			socket = io(HOST, { query: { chatName: selectedChat }, withCredentials: true });
+			socket = io(HOST, { query: { id: selectedChat }, withCredentials: true });
 			socket.on('dcMsg', (msg) => {
 				setMessageHistory((prevHistory) => {
 					const newHistory = [...prevHistory];
 					newHistory.unshift({
 						rem: false,
-						avatarURL: msg.user.displayAvatarURL,
+						avatarURL: msg.avatarURL,
 						content: msg.content
 					});
 					return newHistory;
@@ -120,7 +120,7 @@ function Chat({ selectedChat, messageHistory, setMessageHistory }) {
 
 	const sendMessage = () => {
 		// send message to server
-		socket.emit('remMsg', { chatName: selectedChat, content: message });
+		socket.emit('remMsg', { id: selectedChat, content: message });
 		// update chat log
 		setMessageHistory((prevHistory) => {
 			const newHistory = [...prevHistory];
