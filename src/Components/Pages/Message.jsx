@@ -105,18 +105,18 @@ function Chat({ selectedChat, messageHistory, setMessageHistory }) {
 
 	useEffect(() => {
 		if (selectedChat) {
-			socket = io('/', { query: { chatName: selectedChat } });
-			// socket.on('dcMsg', (msg) => {
-			// 	setMessageHistory((prevHistory) => {
-			// 		const newHistory = [...prevHistory];
-			// 		newHistory.unshift({
-			// 			rem: false,
-			// 			avatarURL: msg.user.displayAvatarURL,
-			// 			content: msg.content
-			// 		});
-			// 		return newHistory;
-			// 	});
-			// });
+			socket = io(HOST, { query: { chatName: selectedChat }, withCredentials: true });
+			socket.on('dcMsg', (msg) => {
+				setMessageHistory((prevHistory) => {
+					const newHistory = [...prevHistory];
+					newHistory.unshift({
+						rem: false,
+						avatarURL: msg.user.displayAvatarURL,
+						content: msg.content
+					});
+					return newHistory;
+				});
+			});
 	
 			return () => {
 				socket.disconnect();
