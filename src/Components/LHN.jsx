@@ -41,7 +41,7 @@ export default function LHN() {
 				<ul className="nav-list">
 					{renderTab('Home')}
 					{auth && renderTab('Cards')}
-					{auth && renderTab('Palia')}
+					{/* {auth && renderTab('Palia')} */}
 					{auth.admin && renderTab('Message')}
 					<li onClick={logout}>Logout</li>
 				</ul>
