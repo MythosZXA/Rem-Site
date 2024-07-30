@@ -1,0 +1,15 @@
+#tableRoll {
+  margin-top: 100px;
+}
+
+img {
+  width: 100px;
+}
+
+img.rem {
+  content: url("src/Images/ReZero/remdisgust.png");
+}
+
+img.ram {
+  content: url("src/Images/ReZero/ramdisgust.png");
+}
