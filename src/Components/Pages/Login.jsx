@@ -14,7 +14,7 @@ export function Login() {
   const [reqType, setReqType] = useState('U');
 
   useEffect(() => {
-    
+    navigate('/home');
   }, []);
 
   const login = async () => {
@@ -83,7 +83,7 @@ export function Login() {
             <button onClick={resetLogin}><span>Reset</span></button>
             <button onClick={login}><span>Login</span></button>
           </div>
-          <button className="login-button">
+          <button className="login-button" onClick={() => { location.href = "https://discord.com/oauth2/authorize?client_id=773657778593202217&response_type=token&redirect_uri=https%3A%2F%2Frem.mythzxa.com%2Fhome&scope=identify" }}>
             <span className="fa-brands fa-discord"/>
             <b>Login with Discord</b>
           </button>
