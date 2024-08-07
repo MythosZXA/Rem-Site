@@ -1,18 +1,21 @@
-import { useEffect, useContext } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../../AuthContext';
+import api from '../../api';
 import './Login.css';
 
 export function Login() {
   const navigate = useNavigate();
-  const {auth, setAuth} = useContext(AuthContext);
 
+  // navigate to home page if session exists with SID
   useEffect(() => {
-    
+    (async () => {
+      const resBody = await api('POST', 'login', { reqType: 'R' });
+      if (resBody) navigate('/home');
+    })();
   }, []);
 
   return (
-    <AuthContext.Provider value={{auth, setAuth}}>
+    <>
       <div className="left-login"/>
       <div className="right-login">
         <span/>
@@ -24,6 +27,6 @@ export function Login() {
         </div>
         <p>レム</p>
       </div>
-    </AuthContext.Provider>
+    </>
   )
 }
