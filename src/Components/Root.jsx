@@ -13,54 +13,35 @@ export default function Root() {
   let token = params.get("access_token");
   let tokenType = params.get("token_type");
 
-  // get discord user info
+  // authenticate
   useEffect(() => {
     (async () => {
+      let newAuth;
       try {
-        // if no token from query string, check server for an active session
-        if (!token) {
-          [token, tokenType] = await restoreToken();
-        }
-
-        // if no token from server, redirect back to login
-        if (!token) {
-          navigate('/login');
-        }
-
-        // request user information from discord
-        const res = await fetch('https://discord.com/api/users/@me', {
-          headers: {
-            authorization: `${tokenType} ${token}`
-          }
-        });
-      
-        // if no information was returned, redirect back to login
-        if (!res.ok) {
-          navigate('/login');
-        }
-
-        // store user information into context
-        const dcUserInfo = await res.json();
-        dcUserInfo.accessToken = token;
-        dcUserInfo.tokenType = tokenType;
-        setAuth(dcUserInfo);
+        // create session if there is a token, otherwise check server for an active session
+        newAuth = token ? await requestSession(token, tokenType) : await requestSession();
       } catch (e) {
         console.error(e);
-        // navigate('/login');
+        navigate('/login');
       }
+
+      // set user info (session created/restored)
+      if (newAuth) {
+        setAuth(newAuth);
+      }
+      // if no session returned from server, redirect back to login
+      else {
+        navigate('/login');
+      }
+
     })();
   }, []);
 
-  // once authorized, request session cookies from server
+  // once authenticated, redirect to home
+  // already on the page but this clears the query string
   useEffect(() => {
     if (!auth) return;
 
-    (async () => {
-      const resBody = await api('POST', 'login', { user: auth, reqType: 'L' });
-      console.log(resBody)
-    })();
-
-    // redirect to home (already on the page but this clears the query string)
     navigate('/home');
   }, [auth]);
 
@@ -78,11 +59,14 @@ function ProtectedRoute({ auth, children }) {
 
 //** HELPER FUNCTIONS */
 
-const restoreToken = async () => {
-  const resBody = await api('POST', 'login', { reqType: 'R' });
-  if (resBody) {
-    return [resBody.token, resBody.tokenType];
-  }
-}
+// create session if token is provided
+// otherwise restore session
+async function requestSession(token, tokenType) {
+  const resBody = await api('POST', 'login', {
+    tokenInfo: [token, tokenType],
+    reqType: token ? 'L' : 'R'
+  });
+  return resBody?.userSess ?? null;
+};
 
 //** END HELPER FUNCTIONS */
