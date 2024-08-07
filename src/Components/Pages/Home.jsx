@@ -5,7 +5,7 @@ import './Home.css';
 export default function Home() {
   const {auth, setAuth} = useContext(AuthContext);
 
-  const fileExt = auth.avatar.startsWith('a_') ? 'gif' : 'webp';
+  const fileExt = auth.avatar?.startsWith('a_') ? 'gif' : 'webp';
 
   return(
     <div className="page-container active" id="containerHome">
