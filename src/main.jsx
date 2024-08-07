@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { RouterProvider, createBrowserRouter, useNavigate } from 'react-router-dom';
+import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import { Login } from './Components/Pages/Login.jsx';
 import { AuthProvider } from './AuthContext.jsx';
 import Root from './Components/Root.jsx';
