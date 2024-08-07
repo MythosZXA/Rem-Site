@@ -120,7 +120,7 @@ function Chat({ selectedChat, messageHistory, setMessageHistory }) {
 
   const sendMessage = () => {
     // send message to server
-    socket.emit('remMsg', { id: selectedChat, content: message });
+    socket.emit('remDM', { id: selectedChat, content: message });
     // update chat log
     setMessageHistory((prevHistory) => {
       const newHistory = [...prevHistory];
