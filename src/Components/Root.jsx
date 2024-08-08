@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react';
+import { useEffect, useContext } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../AuthContext';
 import LHN from './LHN';
@@ -28,22 +28,15 @@ export default function Root() {
       // set user info (session created/restored)
       if (newAuth) {
         setAuth(newAuth);
+        // redirect to home (already on the page but this clears the query string)
+        navigate('/home');
       }
       // if no session returned from server, redirect back to login
       else {
         navigate('/login');
       }
-
     })();
   }, []);
-
-  // once authenticated, redirect to home
-  // already on the page but this clears the query string
-  useEffect(() => {
-    if (!auth) return;
-
-    navigate('/home');
-  }, [auth]);
 
   return (
     <ProtectedRoute auth={auth}>
