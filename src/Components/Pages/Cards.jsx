@@ -31,6 +31,7 @@ function Lobby({ setActive, setHand }) {
   const [players, setPlayers] =  useState([]); // players currently in the lobby
   const [selected, setSelected] = useState(new Set()); // players currently selected
 
+  // set up SSE for lobby information
   useEffect(() => {
     const lobby = new EventSource(`${HOST}/cards/lobby`, { withCredentials: true });
 
@@ -57,13 +58,15 @@ function Lobby({ setActive, setHand }) {
     if (!players.length) {
       setSelected(new Set());
     } else {
+      // loop through selected usernames and remove those that aren't in the lobby
+      const cloneSet = new Set([...selected]);
       selected.forEach(username => {
         if (!players.some(player => player.username === username)) {
-          const newSel = new Set(selected);
-          newSel.delete(username);
-          setSelected(newSel);
+          cloneSet.delete(username);
         }
       });
+
+      setSelected(cloneSet);
     }
   }, [players]);
 
