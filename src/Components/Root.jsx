@@ -59,7 +59,7 @@ async function requestSession(token, tokenType) {
     tokenInfo: [token, tokenType],
     reqType: token ? 'L' : 'R'
   });
-  return resBody?.userSess ?? null;
+  return resBody?.sessUser ?? null;
 };
 
 //** END HELPER FUNCTIONS */
