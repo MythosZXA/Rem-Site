@@ -1,44 +1,52 @@
-import { HOST } from "../../config";
 import { useContext, useEffect, useRef, useState } from "react";
+import { io } from 'socket.io-client';
+import { HOST } from "../../config";
 import { AuthContext } from "../../AuthContext.jsx";
 import Draggable from "react-draggable";
 import api from '../../api.js';
 import cards from '../../Images/Cards/index.js';
 import './Cards.css';
 
+let socket;
+
 export default function Cards() {
   const [active, setActive] = useState(false);
-  const [hand, setHand] = useState([]);
   
   return(
     <div className="page-container" id="containerCards">
       {active ?
         <Game
-          hand={ hand }
-          setHand={ setHand }
         /> :
         <Lobby
           setActive={ setActive }
-          setHand={ setHand }
         />
       }
     </div>
   )
 }
 
-function Lobby({ setActive, setHand }) {
+function Lobby({ setActive }) {
   const {auth, setAuth} = useContext(AuthContext);
-  const [players, setPlayers] =  useState([]); // players currently in the lobby
-  const [selected, setSelected] = useState(new Set()); // players currently selected
+  const [guests, setGuests] =  useState([]); // guests currently in the lobby
+  const [selected, setSelected] = useState(new Set()); // guests currently selected
 
   // set up SSE for lobby information
   useEffect(() => {
     const lobby = new EventSource(`${HOST}/cards/lobby`, { withCredentials: true });
 
-    // lobby was updated
+    // lobby was updated or game started
     lobby.onmessage = e => {
-      const filteredLobby = JSON.parse(e.data).filter(guest => guest.username !== auth.username);
-      setPlayers(filteredLobby);
+      const jsonData = JSON.parse(e.data);
+
+      // if response has guest data then it's a lobby
+      if (jsonData[0]?.username) {
+        const filteredLobby = jsonData.filter(guest => guest.username !== auth.username);
+        setGuests(filteredLobby);
+      }
+      // otherwise it's a table
+      else {
+        setActive(true);
+      }
     };
 
     // error
@@ -53,22 +61,22 @@ function Lobby({ setActive, setHand }) {
     };
   }, []);
 
-  // remove selected players that aren't in lobby
+  // remove selected guests that aren't in lobby
   useEffect(() => {
-    if (!players.length) {
+    if (!guests.length) {
       setSelected(new Set());
     } else {
       // loop through selected usernames and remove those that aren't in the lobby
       const cloneSet = new Set([...selected]);
       selected.forEach(username => {
-        if (!players.some(player => player.username === username)) {
+        if (!guests.some(player => player.username === username)) {
           cloneSet.delete(username);
         }
       });
 
       setSelected(cloneSet);
     }
-  }, [players]);
+  }, [guests]);
 
   const selectPlayer = username => {
     const newSel = new Set(selected);
@@ -80,27 +88,26 @@ function Lobby({ setActive, setHand }) {
     setSelected(newSel);
   }
 
-  const startGame = async () => {
-    const resBody = await api('POST', 'cards/start', {
-      players: [...selected]
+  const beginGame = async () => {
+    const resBody = await api('POST', 'cards/begin', {
+      players: [auth.username, ...selected]
     });
 
     if (resBody) {
       setActive(true);
-      setHand(resBody);
     }
   }
 
   return (
     <div className="select-container">
       <h3>Select up to 3 other players</h3>
-      {players.length > 0 ?
+      {guests.length > 0 ?
         <>
-          <PlayerList players={players} selected={selected} selectPlayer={selectPlayer}/>
-          {selected.size > 0 && <button onClick={startGame}>Start</button>}
+          <PlayerList players={guests} selected={selected} selectPlayer={selectPlayer}/>
+          {selected.size > 0 && <button onClick={beginGame}>Start</button>}
         </>
         :
-        <h4>No other players currently in the lobby...</h4>
+        <h4>No other guests currently in the lobby...</h4>
       }
     </div>
 
@@ -129,9 +136,24 @@ function Player({ player, selected, selectPlayer }) {
   )
 }
 
-function Game({ hand, setHand }) {
+function Game() {
   const tableRef = useRef();
+  const {auth, setAuth} = useContext(AuthContext);
   const [table, setTable] = useState([[]]);
+  const [hand, setHand] = useState([]);
+
+  // initialize socket to get/play cards
+  useEffect(() => {
+    socket = io(HOST, { query: {id: `HandCard-${auth.id}`}, withCredentials: true });
+    
+    socket.on('hand', (hand) => {
+      setHand(hand);
+    });
+
+    return () => {
+      socket.disconnect();
+    }
+  }, []);
 
   const placeCard = (e, dragData) => {
     const tableRect = tableRef.current.getBoundingClientRect();
