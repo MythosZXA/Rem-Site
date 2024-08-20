@@ -2,7 +2,6 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { io } from 'socket.io-client';
 import { HOST } from "../../config";
 import { AuthContext } from "../../AuthContext.jsx";
-import Draggable from "react-draggable";
 import api from '../../api.js';
 import cards from '../../Images/Cards/index.js';
 import './Cards.css';
@@ -139,8 +138,9 @@ function Player({ player, selected, selectPlayer }) {
 function Game() {
   const tableRef = useRef();
   const {auth, setAuth} = useContext(AuthContext);
-  const [table, setTable] = useState([[]]);
+  const [table, setTable] = useState([]);
   const [hand, setHand] = useState([]);
+  const [toPlay, setToPlay] = useState([]);
 
   // initialize socket to get/play cards
   useEffect(() => {
@@ -155,109 +155,70 @@ function Game() {
     }
   }, []);
 
-  const placeCard = (e, dragData) => {
-    const tableRect = tableRef.current.getBoundingClientRect();
-    const cardOrigin = dragData.node.getAttribute('origin');
+  const addToPlay = (index) => {
+    // remove from hand
+    const newHand = [...hand];
+    const selectedCard = newHand.splice(index, 1);
+    setHand(newHand);
+    // add to toPlay
+    const newToPlay = [...toPlay, ...selectedCard];
+    setToPlay(newToPlay);
+  };
 
+  const removeFromPlay = (index) => {
+    // remove from toPlay
+    const newToPlay = [...toPlay];
+    const selectedCard = newToPlay.splice(index, 1);
+    console.log(selectedCard);
+    setToPlay(newToPlay);
+    // add to hand
+    const newHand = [...hand, ...selectedCard];
+    setHand(newHand);
+  };
 
-    if (cardOrigin === 'table' && !isInsideTable({x: e.clientX, y: e.clientY}, tableRect)) {
-      takeFromTable(dragData.node.id);
-    } else if (cardOrigin === 'hand') {
-      if (isInsideTable({x: e.clientX, y: e.clientY}, tableRect)) {
-        placeToTable(dragData.node.id);
-      } else if (e.clientX < tableRect.left) {
-        moveCard(dragData.node.id, 'B');
-      } else if (e.clientX > tableRect.right) {
-        moveCard(dragData.node.id, 'F');
-      }
-    }
-  }
-
-  // helper functions
-  const isInsideTable = (mousePos, tableRect) => {
-    if (tableRect.left < mousePos.x && mousePos.x < tableRect.right &&
-        tableRect.top < mousePos.y && mousePos.y < tableRect.bottom) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-  const placeToTable = (cardID) => {
-    // add card from hand to table
-    setTable(prevTable => {
-      const newTable = [...prevTable];
-      newTable[newTable.length - 1].push(cardID);
-      return newTable;
-    });
-    // remove card from hand
-    setHand(prevHand => {
-      let newHand = [...prevHand];
-      newHand = newHand.filter(card => card !== cardID);
-      return newHand;
-    });
-  }
-  const takeFromTable = (cardID) => {
-    // remove card from table
-    setTable(prevTable => {
-      const newTable = [...prevTable];
-      newTable[newTable.length - 1] = newTable[newTable.length - 1].filter(card => card !== cardID);
-      return newTable;
-    });
-    // add card to hand
-    setHand(prevHand => {
-      const newHand = [...prevHand];
-      newHand.push(cardID);
-      return newHand;
-    });
-  }
-  const moveCard = (cardID, destination) => {
-    setHand(prevHand => {
-      let newHand = [...prevHand];
-      newHand = newHand.filter(card => card !== cardID);
-      destination === 'F' ? newHand.push(cardID) : newHand.unshift(cardID);
-      return newHand;
-    });
-  }
+  const play = () => {
+    socket.emit('cardPlay', { arrCards: toPlay });
+    setToPlay([]);
+  };
 
   return (
-    <div>
-      <div className="table column" ref={tableRef}>
+    <>
+      <div className="table column">
         {table.map((row, i) => (
           <div key={`tr${i}`} className="hand">
             {row.map((card, i) => (
-              <Draggable
-                key={`td${card}`}
-                onStop={(e, dragData) => placeCard(e, dragData)}
-                position={{x: 0, y: 0}}
-              >
-                <div
-                  className="card"
-                  id={card}
-                  origin="table"
-                  style={{backgroundImage: `url(${cards[card]})`}}
-                />
-              </Draggable>
+              <div
+                key={`tb${card}`}
+                className="card"
+                style={{backgroundImage: `url(${cards[card]})`}}
+              />
             ))}
           </div>
         ))}
-        {table[table.length-1].length > 0 && <button><span>Play</span></button>}
+      </div>
+      <div className="hand" ref={tableRef}>
+        {toPlay.map((card, i) => (
+          <div
+            key={`tp${card}`}
+            className="card"
+            style={{backgroundImage: `url(${cards[card]})`}}
+            onClick={() => removeFromPlay(i)}
+          />
+        ))}
+        {toPlay.length > 0 &&
+          <button onClick={play}>Play</button>
+        }
       </div>
       <div className="hand">
-        {hand.map(card => (
-          <Draggable
-            key={`d${card}`}
-            onStop={(e, dragData) => placeCard(e, dragData)}
-            position={{x: 0, y: 0}}
-          >
-            <div
-              className="card"
-              id={card}
-              origin="hand"
-              style={{backgroundImage: `url(${cards[card]})`}}
-            />
-          </Draggable>
+        {hand.map((card, i) => (
+          <div
+            key={`h${card}`}
+            className="card"
+            style={{backgroundImage: `url(${cards[card]})`}}
+            onClick={() => addToPlay(i)}
+          />
         ))}
       </div>
-    </div>
+    </>
   )
 }
