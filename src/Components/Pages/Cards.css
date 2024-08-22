@@ -73,6 +73,7 @@ div:has(> .table) {
   border: solid 5px;
   height: 800px;
   width: 875px;
+  overflow-y: scroll;
 }
 
 .table button {

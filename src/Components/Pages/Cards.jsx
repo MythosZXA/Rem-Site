@@ -25,7 +25,7 @@ export default function Cards() {
 }
 
 function Lobby({ setActive }) {
-  const {auth, setAuth} = useContext(AuthContext);
+  const {auth} = useContext(AuthContext);
   const [guests, setGuests] =  useState([]); // guests currently in the lobby
   const [selected, setSelected] = useState(new Set()); // guests currently selected
 
@@ -38,11 +38,11 @@ function Lobby({ setActive }) {
       const jsonData = JSON.parse(e.data);
 
       // if response has guest data then it's a lobby
-      if (jsonData[0]?.username) {
+      if (jsonData[0]?.username) { // prolly needs to be refactored
         const filteredLobby = jsonData.filter(guest => guest.username !== auth.username);
         setGuests(filteredLobby);
       }
-      // otherwise it's a table
+      // otherwise there's an active game
       else {
         setActive(true);
       }
@@ -136,9 +136,7 @@ function Player({ player, selected, selectPlayer }) {
 }
 
 function Game() {
-  const tableRef = useRef();
-  const {auth, setAuth} = useContext(AuthContext);
-  const [table, setTable] = useState([]);
+  const {auth} = useContext(AuthContext);
   const [hand, setHand] = useState([]);
   const [toPlay, setToPlay] = useState([]);
 
@@ -183,20 +181,8 @@ function Game() {
 
   return (
     <>
-      <div className="table column">
-        {table.map((row, i) => (
-          <div key={`tr${i}`} className="hand">
-            {row.map((card, i) => (
-              <div
-                key={`tb${card}`}
-                className="card"
-                style={{backgroundImage: `url(${cards[card]})`}}
-              />
-            ))}
-          </div>
-        ))}
-      </div>
-      <div className="hand" ref={tableRef}>
+      <Table/>
+      <div className="hand">
         {toPlay.map((card, i) => (
           <div
             key={`tp${card}`}
@@ -220,5 +206,47 @@ function Game() {
         ))}
       </div>
     </>
-  )
+  );
+}
+
+function Table() {
+  const [table, setTable] = useState([]);
+
+  useEffect(() => {
+    const tableE = new EventSource(`${HOST}/cards/table`, { withCredentials: true });
+
+    // lobby was updated or game started
+    tableE.onmessage = e => {
+      const jsonData = JSON.parse(e.data);
+
+      setTable(jsonData);
+    };
+
+    // error
+    tableE.onerror = e => {
+      console.error(e);
+      tableE.close();
+    };
+
+    // stop spectating game
+    return () => {
+      tableE.close();
+    };
+  }, []);
+
+  return (
+    <div className="table column">
+      {table.map((row, i) => (
+        <div key={`r${i}`} className="hand">
+          {row.map(card => (
+            <div
+              key={`tb${card}`}
+              className="card"
+              style={{backgroundImage: `url(${cards[card]})`}}
+            />
+          ))}
+        </div>
+      ))}
+    </div>
+  );
 }
