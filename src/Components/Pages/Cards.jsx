@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { io } from 'socket.io-client';
 import { HOST } from "../../config";
 import { AuthContext } from "../../AuthContext.jsx";
@@ -15,7 +15,9 @@ export default function Cards() {
     <div className="page-container" id="containerCards">
       {active ?
         <Game
-        /> :
+          setActive={ setActive }
+        />
+        :
         <Lobby
           setActive={ setActive }
         />
@@ -37,14 +39,14 @@ function Lobby({ setActive }) {
     lobby.onmessage = e => {
       const jsonData = JSON.parse(e.data);
 
-      // if response has guest data then it's a lobby
-      if (jsonData[0]?.username) { // prolly needs to be refactored
+      // switch to table view if there's an active game
+      if (jsonData === 'Active') {
+        setActive(true);
+      }
+      // otherwise populate the lobby
+      else {
         const filteredLobby = jsonData.filter(guest => guest.username !== auth.username);
         setGuests(filteredLobby);
-      }
-      // otherwise there's an active game
-      else {
-        setActive(true);
       }
     };
 
@@ -135,7 +137,7 @@ function Player({ player, selected, selectPlayer }) {
   )
 }
 
-function Game() {
+function Game({ setActive }) {
   const {auth} = useContext(AuthContext);
   const [hand, setHand] = useState([]);
   const [toPlay, setToPlay] = useState([]);
@@ -167,7 +169,6 @@ function Game() {
     // remove from toPlay
     const newToPlay = [...toPlay];
     const selectedCard = newToPlay.splice(index, 1);
-    console.log(selectedCard);
     setToPlay(newToPlay);
     // add to hand
     const newHand = [...hand, ...selectedCard];
@@ -181,7 +182,7 @@ function Game() {
 
   return (
     <>
-      <Table/>
+      <Table setActive={ setActive }/>
       <div className="hand">
         {toPlay.map((card, i) => (
           <div
@@ -209,7 +210,7 @@ function Game() {
   );
 }
 
-function Table() {
+function Table({ setActive }) {
   const [table, setTable] = useState([]);
 
   useEffect(() => {
@@ -219,7 +220,11 @@ function Table() {
     tableE.onmessage = e => {
       const jsonData = JSON.parse(e.data);
 
-      setTable(jsonData);
+      if (jsonData === 'Waiting') {
+        setActive(false);
+      } else {
+        setTable(jsonData);
+      }
     };
 
     // error
