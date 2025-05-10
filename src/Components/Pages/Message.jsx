@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import io from 'socket.io-client';
 import api from '../../api';
 import './Message.css';
+import '../loading_wave.css';
 
 let socket;
 let remAvatarURL;
@@ -66,16 +67,25 @@ function ChatSelect({ selectedChat, setSelectedChat, setMessageHistory }) {
       </label>
       <div>
         <ul>
-          {members.map((member, i) => (
-            <li
-              key={`mc${i}`}
-              className={member.userId === selectedChat ? "selected" : ""}
-              onClick={() => selectChat(member.userId)}
-            >
-              <span style={{backgroundImage: `url(${member.displayAvatarURL})`}}/>
-              <p>{member.displayName}</p>
-            </li>
-          ))}
+          {members.length ?
+            members.map((member, i) => (
+              <li
+                key={`mc${i}`}
+                className={member.userId === selectedChat ? "selected" : ""}
+                onClick={() => selectChat(member.userId)}
+              >
+                <span style={{backgroundImage: `url(${member.displayAvatarURL})`}}/>
+                <p>{member.displayName}</p>
+              </li>
+            ))
+            :
+            <div class="loading-wave">
+              <div class="loading-bar"></div>
+              <div class="loading-bar"></div>
+              <div class="loading-bar"></div>
+              <div class="loading-bar"></div>
+            </div>
+          }
         </ul>
         <ul>
           {channels.map((channel, i) => (

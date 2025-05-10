@@ -58,7 +58,7 @@ div:has(> .chat-select) {
   transform: translateX(26px);
 }
 
-.chat-select div {
+.chat-select>div {
 	display: flex;
 	margin-top: 17px;
 	width: 200%;
