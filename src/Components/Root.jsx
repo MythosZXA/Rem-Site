@@ -1,8 +1,9 @@
 import { useEffect, useContext } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../AuthContext';
-import LHN from './LHN';
+import NavBar from './NavBar/navbar';
 import '../App.css';
+import './NavBar/navbar.css'
 import api from '../api';
 
 export default function Root() {
@@ -40,7 +41,7 @@ export default function Root() {
 
   return (
     <ProtectedRoute auth={auth}>
-      <LHN/>
+      <NavBar/>
       <Outlet/>
     </ProtectedRoute>
   )

@@ -16,9 +16,17 @@ ul {
 	border-radius: 5px;
 }
 
+#root {
+  display: flex;
+  flex-direction: column;
+}
+
+#root:has(.navbar) {
+  align-items: center;
+}
+
 /* pages */
 .page-container {
-	z-index: 90;
 	position: absolute;
 	display: flex;
 	flex-direction: column;
@@ -27,6 +35,5 @@ ul {
 	height: 100%;
 	width: 100%;
 	background-color: dimgray;
-	transition: transform .5s;
 }
 /* pages end */
