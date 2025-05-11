@@ -1,0 +1,30 @@
+.navbar {
+  z-index: 100;
+  position: absolute;
+  display: flex;
+  height: 20px;
+  width: 20px;
+  border-radius: 10px;
+  background-color: cyan;
+  justify-content: space-evenly;
+  align-items: center;
+  transition: width .3s, height .1s .3s;
+}
+
+.navbar:hover {
+  height: 40px;
+  width: 250px;
+  transition: height .1s, width .3s .1s;
+}
+
+.navbar>svg {
+  border-radius: 5px;
+  color: white;
+  height: 1.5em;
+  width: 1.5em;
+}
+
+svg:hover {
+  background-color: pink;
+  color: gray;
+}
